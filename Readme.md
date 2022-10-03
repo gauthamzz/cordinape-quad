@@ -6,12 +6,15 @@ Copy cordinape results to `files/data.json`
 
 ```graphql
 query PerPersonGive {
-  token_gifts(where: { epoch_id: { _eq: 8576 } }) {
+  token_gifts(where: { epoch_id: { _eq: EPOCH_ID } }) {
     sender_id
     sender_address
     recipient_id
     recipient_address
     tokens
+    recipient {
+      name
+    }
   }
 }
 ```

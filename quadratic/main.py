@@ -4,7 +4,9 @@ from typing import final
 from dataclasses import dataclass
 import csv 
 
-
+@dataclass
+class Recipient:
+    name: str
 @dataclass
 class TokenGift:
     sender_id: int
@@ -12,9 +14,16 @@ class TokenGift:
     recipient_id: int 
     recipient_address: str 
     tokens: int
+    recipient: Recipient
 
 def get_amount_per_user(token_gift: TokenGift):
     return token_gift["recipient_address"], math.sqrt(token_gift["tokens"])
+
+def get_recipient_name(token_gift: TokenGift):
+    if(token_gift["recipient"] and token_gift["recipient"]['name']): 
+        return token_gift["recipient"]['name']
+    return None
+
 
 def square_amounts(amounts): 
     sqaured_amt = {}
@@ -33,6 +42,7 @@ def final_ratio(sqaured_amt, sum):
 
 def main(): 
     amount = {}
+    recipient_address_name_map = {}
 
     f = open("./files/data.json", 'r')
     data = json.load(f)
@@ -42,7 +52,8 @@ def main():
         if recipient_address in amount: 
             amount[recipient_address] += amt 
         else:
-            amount[recipient_address] = amt 
+            amount[recipient_address] = amt
+        recipient_address_name_map[recipient_address]  = get_recipient_name(i)
 
     f.close()
 
@@ -52,8 +63,9 @@ def main():
     filename = "./files/output.csv"    
     with open(filename, 'w') as csvfile: 
         csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(["name", "address", "score", "ratio"])
         for addr, vals in final_amt.items(): 
             amt, ratio = vals
-            csvwriter.writerow([addr, amt, ratio])             
+            csvwriter.writerow([recipient_address_name_map.get(addr), addr, amt, ratio ])             
 
 
